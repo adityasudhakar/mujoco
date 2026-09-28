@@ -1,0 +1,87 @@
+# Cart-Pole MuJoCo Playground
+
+Hands-on experiments with MuJoCo physics simulation using a cart-pole model.
+
+## Setup
+
+Requires Python 3.12 with MuJoCo installed:
+
+```sh
+pip install mujoco
+```
+
+## Running the Viewer
+
+```sh
+python view_cart_pole.py
+```
+
+Or directly:
+
+```sh
+python -m mujoco.viewer --mjcf=cart_pole.xml
+```
+
+## Viewer Controls (Mac Trackpad)
+
+### Navigation
+- **One-finger drag**: Rotate camera
+- **Two-finger drag**: Pan camera
+- **Pinch/scroll**: Zoom in/out
+
+### Simulation Control
+- **Space**: Toggle play/pause
+- **Backspace** (Delete key): Reset simulation
+- **Reload button**: Reload XML file fresh
+
+### Applying Forces (Perturbations)
+1. **Double-click** on a body to select it (body gets highlighted)
+2. **Ctrl + two-finger drag**: Apply force to selected body
+3. **Release**: Force stops, physics continues
+
+When dragging with Ctrl held, you'll see **two bodies**:
+- The **actual body** (connected to physics)
+- A **ghost/target body** showing where you're dragging to
+
+The gap between them represents the force being applied. MuJoCo applies forces to push the real body toward the ghost. This is the perturbation visualization - not an arrow, but a target indicator.
+
+### Selection
+- **Double-click**: Select a body
+- **Click empty space**: Deselect (may not always work in Python viewer)
+- **Esc**: Should deselect (limited in Python viewer)
+
+### Actuator Control
+Expand the **Control** panel on the right side:
+- `cart_motor` slider: Apply force to cart (-10 to +10 N)
+- Drag slider to push cart left/right, which tips the pole
+
+## Model Details
+
+From `cart_pole.xml`:
+- **Cart**: Blue box, 1 kg, slides on rail (x-axis)
+- **Pole**: Orange-yellow rod (`rgba="1 0.75 0.1 1"`), 0.25 kg, hinges at base
+- **Pole tip**: Red sphere (`rgba="0.95 0.20 0.12 1"`), 0.04 kg
+- **Gravity**: Earth standard (9.81 m/s^2)
+- **No balancing controller**: Pole will fall when disturbed
+
+## Notes
+
+- The Python viewer (`mujoco.viewer.launch`) has fewer keyboard shortcuts than the standalone C++ `simulate` app
+- Keys like P, F, R for visualization toggles may not work in Python viewer
+- The pole color is intentionally orange (not yellow) - defined in the XML
+- The pole starts perfectly upright; it may stay balanced until disturbed due to numerical precision, not because it can balance itself
+
+## Next Steps
+
+1. Change gravity in XML (e.g., `0 0 -1.62` for Moon) and observe difference
+2. Add a simple feedback controller to balance the pole
+3. Train an RL policy for balancing
+
+## Session Log
+
+### 2024-09-28: Initial exploration
+- Learned basic viewer navigation (camera rotation, pan, zoom)
+- Figured out force application: Ctrl + trackpad drag on selected body
+- Discovered perturbation visualization shows as ghost target body, not arrow
+- Confirmed pole color is orange by design (XML rgba values)
+- Reset vs Reload: Reset restores state, Reload re-reads XML file
