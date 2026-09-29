@@ -43,7 +43,7 @@
   </contact>
   <actuator>
     <!-- Manual force slider in the viewer's Control panel; initially zero. -->
-    <motor name="cart_motor" joint="cart_slide" ctrlrange="-10 10"/>
+    <motor name="cart_motor" joint="cart_slide" ctrlrange="-100 100"/>
   </actuator>
   <sensor>
     <jointpos name="cart_position" joint="cart_slide"/>

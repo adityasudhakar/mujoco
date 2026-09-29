@@ -71,11 +71,47 @@ From `cart_pole.xml`:
 - The pole color is intentionally orange (not yellow) - defined in the XML
 - The pole starts perfectly upright; it may stay balanced until disturbed due to numerical precision, not because it can balance itself
 
+## Scripts
+
+### `view_cart_pole.py`
+Basic viewer - no controller, pole falls when pushed.
+
+### `balance.py`
+PD controller that actively balances the pole. Run with:
+```sh
+python balance.py
+```
+Push the pole with Ctrl+drag - it recovers!
+
+### `benchmark.py`
+Measures simulation speed on your machine:
+```sh
+python benchmark.py
+```
+
+## Concepts Learned
+
+### Timesteps
+MuJoCo computes physics in discrete steps (0.002s each = 500 steps/sec). Each step: read state → compute forces → update positions.
+
+### PD Control
+Classical feedback controller:
+```python
+force = Kp * pole_angle + Kd * pole_velocity
+```
+- **Kp (proportional)**: React to current error
+- **Kd (derivative)**: React to rate of change (damping)
+
+Tuned values: Kp=300, Kd=50 with motor limit ±100N.
+
+### Why RL for complex robots?
+PD works for simple systems (2 joints). Complex robots (20+ joints) have too many interacting parameters. RL learns the control policy automatically through trial and error.
+
 ## Next Steps
 
-1. Change gravity in XML (e.g., `0 0 -1.62` for Moon) and observe difference
-2. Add a simple feedback controller to balance the pole
-3. Train an RL policy for balancing
+1. ~~Add a simple feedback controller to balance the pole~~ ✓
+2. Train an RL policy for balancing
+3. Compare learned policy vs hand-tuned PD
 
 ## Session Log
 
@@ -85,3 +121,11 @@ From `cart_pole.xml`:
 - Discovered perturbation visualization shows as ghost target body, not arrow
 - Confirmed pole color is orange by design (XML rgba values)
 - Reset vs Reload: Reset restores state, Reload re-reads XML file
+
+### 2024-09-29: PD Controller
+- Implemented PD balancing controller (`balance.py`)
+- Learned control loop: read sensors → compute force → apply → repeat 500x/sec
+- Initial sign was wrong (pushed cart away from lean) - fixed
+- Increased motor limit (10N → 100N) and gains (Kp=300, Kd=50) for stronger recovery
+- Benchmarked: ~300,000 steps/sec on MacBook (592x realtime)
+- Discussed why classical control works for cart-pole but RL needed for complex robots
