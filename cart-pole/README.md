@@ -152,6 +152,47 @@ PD works for simple systems (2 joints). Complex robots (20+ joints) have too man
 2. ~~Train an RL policy for balancing~~ ✓
 3. Compare learned policy vs hand-tuned PD
 
+## Sim2Real Reference: Rotary Inverted Pendulum
+
+Studying [ferrolho/rotary-inverted-pendulum](https://github.com/ferrolho/rotary-inverted-pendulum) - a complete sim2real project using MuJoCo + SB3 + Arduino.
+
+### Key Learnings
+
+**Observations vs Actions**
+- Observations = inputs to neural network (what it sees)
+- Actions = outputs from neural network (what it does)
+- MuJoCo knows everything; you choose what to feed to RL
+
+**Ferrolho's observation vector (6 values per frame):**
+1. `motor_pos` - arm rotation angle (rad)
+2. `sin(θ)` - pendulum angle from upright
+3. `cos(θ)` - pendulum angle from upright
+4. `motor_vel` - arm angular velocity (rad/s)
+5. `pendulum_vel` - pendulum angular velocity (rad/s)
+6. `prev_action` - last motor command sent
+
+**Why sin/cos instead of raw angle?**
+Raw angle wraps at ±180° (jumps from +179° to -179°). sin/cos are smooth everywhere - small physical change = small numerical change.
+
+**Why prev_action?**
+Real motors have lag. Knowing what you commanded helps the network anticipate where motor is heading, not just where it is now. Prevents overshoot.
+
+**Frame stacking (K frames)**
+Feed last K snapshots instead of just current one. Helps filter noise, detect drift, account for command delay. If K=4 with 6 values/frame = 24 total inputs.
+
+**Action space**
+Single number [-1 to +1] = motor direction + intensity. Gets scaled to real units (e.g., ×100 for Newtons).
+
+### Our cart-pole vs Ferrolho's pendulum
+
+| Aspect | Our cart-pole | Ferrolho pendulum |
+|--------|---------------|-------------------|
+| Observations | 4 | 6 (+ frame stacking) |
+| sin/cos angle | No (stays <30°) | Yes (full rotation) |
+| prev_action | No (sim only) | Yes (real hardware) |
+| Frame stacking | No | Yes (K=1-4) |
+| Action | 1 (cart force) | 1 (motor torque) |
+
 ## Session Log
 
 ### 2024-09-28: Initial exploration
