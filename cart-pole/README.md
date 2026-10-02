@@ -178,7 +178,17 @@ Raw angle wraps at ±180° (jumps from +179° to -179°). sin/cos are smooth eve
 Real motors have lag. Knowing what you commanded helps the network anticipate where motor is heading, not just where it is now. Prevents overshoot.
 
 **Frame stacking (K frames)**
-Feed last K snapshots instead of just current one. Helps filter noise, detect drift, account for command delay. If K=4 with 6 values/frame = 24 total inputs.
+Feed last K snapshots instead of just current one. If K=4 with 6 values/frame = 24 total inputs.
+
+When you need it:
+- Velocity not measured (must compute from position changes)
+- Sensors are noisy (need to average/filter)
+- Hidden state like motor lag or sensor bias
+
+When 1 frame is enough:
+- Clean observations with position + velocity
+- No hidden delays or drift
+- Simulation with perfect sensor data (like our cart-pole)
 
 **Action space**
 Single number [-1 to +1] = motor direction + intensity. Gets scaled to real units (e.g., ×100 for Newtons).
