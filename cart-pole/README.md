@@ -193,6 +193,20 @@ When 1 frame is enough:
 **Action space**
 Single number [-1 to +1] = motor direction + intensity. Gets scaled to real units (e.g., ×100 for Newtons).
 
+**Domain randomization**
+Make the simulation intentionally worse to match real-world imperfections:
+- Add Gaussian noise to sensor readings
+- Randomize physics parameters (friction, mass)
+- Quantize encoder readings to match hardware resolution
+
+Goal: Policy trained on "crappy" sim transfers better to real hardware.
+
+**Reward function design**
+Ferrolho uses "Quanser quadratic-cost form" - borrowed from classical control theory literature, not invented:
+- Quadratic penalties: θ², velocity², action² - big errors hurt exponentially more
+- Alive bonus: +1 per step survived - prevents "crash early to stop accumulating penalty"
+- Standard formula for Furuta pendulum control, dating back decades
+
 ### Our cart-pole vs Ferrolho's pendulum
 
 | Aspect | Our cart-pole | Ferrolho pendulum |
