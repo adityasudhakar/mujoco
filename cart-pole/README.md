@@ -146,6 +146,12 @@ PD works for simple systems (2 joints). Complex robots (20+ joints) have too man
 
 **Training scale.** 50k steps = failure. 500k steps = success. RL needs way more samples than you'd expect.
 
+## Project Plan
+
+1. Understand the inverted-pendulum MuJoCo and RL pipeline in [ferrolho/rotary-inverted-pendulum](https://github.com/ferrolho/rotary-inverted-pendulum).
+2. Compare it with HomeMadeGarbage's self-righting robot work, including its MuJoCo motion search and RL approach.
+3. Implement the Ferrolho pipeline on our own hardware and test whether the real pendulum can stand upright. Parts have been ordered from AliExpress.
+
 ## Next Steps
 
 1. ~~Add a simple feedback controller to balance the pole~~ ✓
