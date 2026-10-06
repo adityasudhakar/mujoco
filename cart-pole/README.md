@@ -130,8 +130,20 @@ force = Kp * pole_angle + Kd * pole_velocity
 
 Tuned values: Kp=300, Kd=50 with motor limit ±100N.
 
+### Cart-Pole vs Rotary Inverted Pendulum
+
+Both systems have the same basic control structure: one actuator moves the base while the pendulum joint is passive. The cart-pole moves its base linearly; the rotary pendulum rotates its base arm.
+
+**Key insight:** the important distinction is not linear versus rotary. It is local balancing versus the complete task:
+
+- Starting near upright: PD or full-state feedback can balance either system.
+- Starting with the pendulum hanging down: a simple upright PD controller does not provide a complete swing-up strategy for either system.
+- Keeping the base centered: the controller must also use cart/arm position and velocity, not only pendulum angle and angular velocity.
+
+Our cart-pole PD experiment starts upright and performs local balancing. It does not demonstrate swing-up, and its simple two-term controller can let the cart drift along the rail.
+
 ### Why RL for complex robots?
-PD works for simple systems (2 joints). Complex robots (20+ joints) have too many interacting parameters. RL learns the control policy automatically through trial and error.
+PD and other classical controllers can work extremely well when the dynamics and target behavior are understood. RL becomes attractive as the number of interacting states, behaviors, delays and uncertainties grows because it can learn a policy through trial and error rather than requiring every control rule to be designed manually.
 
 ### RL Training Lessons Learned
 
