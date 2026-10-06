@@ -207,6 +207,19 @@ Ferrolho uses "Quanser quadratic-cost form" - borrowed from classical control th
 - Alive bonus: +1 per step survived - prevents "crash early to stop accumulating penalty"
 - Standard formula for Furuta pendulum control, dating back decades
 
+**Hardware notes (from BOM review)**
+
+Power flow: Wall outlet → 12V power supply → Motor driver → Stepper motor. USB from laptop only powers Arduino (logic signals), not the motor.
+
+BOM components explained:
+- **100nF ceramic cap**: Catches fast tiny voltage spikes from motor switching
+- **22µF electrolytic cap**: Handles slower voltage dips when motor accelerates (bigger shock absorber)
+- **Female header pins (2.54mm)**: Sockets so Arduino/driver plug in instead of being soldered - easy to swap if something breaks
+
+**3D printing tip**: To embed a coin for weight, add a pause command in slicer software (Cura/PrusaSlicer) at the right layer height. Print pauses, you drop coin in cavity, resume print.
+
+**Minimum viable build**: Skip the pretty enclosure. Clamp motor to table, wire it up ugly. Physics doesn't care if it's pretty - get it balancing first.
+
 ### Our cart-pole vs Ferrolho's pendulum
 
 | Aspect | Our cart-pole | Ferrolho pendulum |
