@@ -238,6 +238,25 @@ BOM components explained:
 
 **Minimum viable build**: Skip the pretty enclosure. Clamp motor to table, wire it up ugly. Physics doesn't care if it's pretty - get it balancing first.
 
+**System identification (sysid)**
+
+One-time setup BEFORE training. Measures your specific rig's physics so the sim matches reality.
+
+Timeline: Build hardware → Collect → Fit → Build sim → Train → Deploy
+
+The sysid wizard runs 3 tests:
+| Test | What you do | What it measures |
+|------|-------------|------------------|
+| Tare hanging | Let pendulum hang still | Zero reference angle |
+| Free-swing | Lift, release, let swing | Period, decay → friction, inertia |
+| Motor ±90° sweep | Automatic | Validates no step-skipping |
+
+Derived parameters: viscous friction, Coulomb friction, pendulum inertia. Geometry (mass, length) comes from CAD/URDF - you don't measure those by hand.
+
+Why not just type in values? Some things (friction, motor lag) can't be measured with a scale - you observe behavior and fit parameters from the decay curve.
+
+**Project philosophy**: Ferrolho designed this as a reproducible sim2real template. Fork → build → sysid → train → deploy → working pendulum. Happy path for learners.
+
 ### Our cart-pole vs Ferrolho's pendulum
 
 | Aspect | Our cart-pole | Ferrolho pendulum |
