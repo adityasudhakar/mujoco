@@ -1,0 +1,68 @@
+<mujoco model="Passive hinge vs powered servo">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast"/>
+
+  <visual>
+    <headlight ambient="0.35 0.35 0.35" diffuse="0.8 0.8 0.8"/>
+    <global azimuth="145" elevation="-18"/>
+  </visual>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker"
+             rgb1="0.12 0.18 0.23" rgb2="0.20 0.29 0.36"
+             width="512" height="512"/>
+    <material name="floor" texture="grid" texrepeat="4 4" reflectance="0.15"/>
+    <material name="passive" rgba="1.0 0.48 0.12 1"/>
+    <material name="powered" rgba="0.10 0.55 1.0 1"/>
+    <material name="fixture" rgba="0.35 0.38 0.42 1"/>
+  </asset>
+
+  <default>
+    <joint type="hinge" axis="0 1 0" limited="true"
+           range="-2.094395 2.094395" damping="0.04" armature="0.0001"/>
+    <geom condim="3" friction="0.8 0.02 0.001"/>
+  </default>
+
+  <worldbody>
+    <light pos="0 -1 2" dir="0 0 -1"/>
+    <geom name="floor" type="plane" size="2 2 0.1" material="floor"/>
+
+    <!-- Left: identical geometry, but the elbow is only a passive hinge. -->
+    <body name="passive_fixture" pos="-0.32 0 0.04">
+      <geom type="box" pos="0 0 0.025" size="0.07 0.07 0.025"
+            material="fixture" mass="0.4"/>
+      <geom type="capsule" fromto="0 0 0.05 0 0 0.40" size="0.025"
+            material="fixture" mass="0.25"/>
+      <body name="passive_forearm" pos="0 0 0.40">
+        <joint name="passive_elbow"/>
+        <geom type="capsule" fromto="0 0 0 0.27 0 0" size="0.025"
+              material="passive" mass="0.16"/>
+        <geom type="sphere" pos="0.27 0 0" size="0.035"
+              material="passive" mass="0.04"/>
+      </body>
+    </body>
+
+    <!-- Right: same body and hinge, plus a position-servo actuator below. -->
+    <body name="powered_fixture" pos="0.32 0 0.04">
+      <geom type="box" pos="0 0 0.025" size="0.07 0.07 0.025"
+            material="fixture" mass="0.4"/>
+      <geom type="capsule" fromto="0 0 0.05 0 0 0.40" size="0.025"
+            material="fixture" mass="0.25"/>
+      <body name="powered_forearm" pos="0 0 0.40">
+        <joint name="powered_elbow"/>
+        <geom type="capsule" fromto="0 0 0 0.27 0 0" size="0.025"
+              material="powered" mass="0.16"/>
+        <geom type="sphere" pos="0.27 0 0" size="0.035"
+              material="powered" mass="0.04"/>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <!-- ctrl=0 rad: hold the blue forearm horizontally. -->
+    <position name="powered_servo" joint="powered_elbow"
+              kp="8" kv="0.25"
+              ctrllimited="true" ctrlrange="-2.094395 2.094395"
+              forcelimited="true" forcerange="-1.0 1.0"/>
+  </actuator>
+</mujoco>
