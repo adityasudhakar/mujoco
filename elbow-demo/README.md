@@ -46,3 +46,21 @@ Formula: `motor force = kp × angle_error − kv × joint_speed`
 MuJoCo calculates rest from: gravity, mass/inertia, joint axis/limits, damping, collisions, and (for powered joints) servo target + strength.
 
 **A joint with an actuator is still movable** - the actuator just applies torque toward a target. Strong external force can still move it, especially if actuator force is limited.
+
+**Why the powered forearm rests horizontally:**
+
+The forearm geometry is drawn along the X axis:
+
+```xml
+<geom type="capsule" fromto="0 0 0 0.27 0 0"/>
+```
+
+That is its zero-angle pose. MuJoCo initializes actuator controls to zero, so
+the position actuator holds the joint at `0 rad`, which is horizontal in this
+model. Pointing it straight up requires a target near `-1.57 rad` (-90 deg).
+
+**What "powered" means here:**
+
+The position actuator can continuously apply up to the configured torque limit.
+MuJoCo does not automatically simulate battery charge, voltage sag, electrical
+power use, servo heating, or shutdown; those require additional modeling.
