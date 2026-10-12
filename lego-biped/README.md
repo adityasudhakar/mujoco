@@ -1,5 +1,11 @@
 # Planar LEGO biped
 
+https://github.com/user-attachments/assets/getup-prone-1-success.mp4
+
+<video src="assets/getup-prone-1-success.mp4" controls width="600"></video>
+
+*First successful get-up from prone position (October 12, 2026)*
+
 This is a deliberately small bridge between the rotary pendulum and a fully
 3-D walking robot.
 
@@ -48,9 +54,6 @@ Current status: the XML model loads and the unperturbed robot stands stably.
 After iterative manual tuning, `getup_prone_1` now gets the robot from its
 face-down reset to standing.  The walking and supine get-up motions remain
 unfinished; the first walking draft moves forward but falls at the end.
-
-[Watch the first successful `getup_prone_1` recording](assets/getup-prone-1-success.mov)
-(recorded October 12, 2026).
 
 Run a motion in the interactive viewer:
 
