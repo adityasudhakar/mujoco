@@ -1,5 +1,26 @@
 # Pupper Julia Simulation
 
+## Current learning project
+
+We are building a small planar LEGO/Technic biped as the next MuJoCo + RL
+exercise.  The first version has four powered joints (left/right hip and knee),
+fixed broad feet, and is constrained to forward/backward motion so that we can
+learn one difficulty at a time.
+
+The original plan was to produce three repeatable scripted motions before RL:
+
+1. walk forward;
+2. get up when lying face-down;
+3. get up when lying face-up.
+
+Manual get-up tuning was initially very difficult, and the first 300,000-step
+PPO experiments failed to produce a stand.  Further manual iteration has now
+produced the first successful prone get-up.  The next learning attempt will
+adapt the settled-fall resets, symmetric actions, velocity-style control,
+observations, and staged reward used by UTRA RoboSoccer's Unified Humanoid
+Get-Up project.  The successful recording, failed-RL experiment record, and
+implementation checklist are in `lego-biped/README.md`.
+
 ## Overview
 This repository contains the Julia code that runs on the Raspberry Pi-based Pupper robot, as well as the Julia code for simulating the same code in a MuJoCo environment on a desktop computer. 
 

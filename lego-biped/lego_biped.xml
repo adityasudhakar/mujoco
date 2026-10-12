@@ -1,0 +1,136 @@
+<mujoco model="planar LEGO biped">
+  <compiler angle="degree" autolimits="true"/>
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="implicitfast">
+    <flag contact="enable"/>
+  </option>
+
+  <visual>
+    <headlight ambient="0.35 0.35 0.35" diffuse="0.8 0.8 0.8" specular="0.2 0.2 0.2"/>
+    <rgba haze="0.12 0.18 0.24 1"/>
+    <global azimuth="135" elevation="-18"/>
+  </visual>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512"
+             rgb1="0.16 0.22 0.27" rgb2="0.28 0.36 0.42"/>
+    <material name="floor" texture="grid" texrepeat="5 5" reflectance="0.1"/>
+    <material name="torso_mat" rgba="0.10 0.45 0.85 1"/>
+    <material name="left_mat" rgba="0.95 0.72 0.10 1"/>
+    <material name="right_mat" rgba="0.92 0.25 0.18 1"/>
+    <material name="joint_mat" rgba="0.12 0.12 0.14 1"/>
+    <material name="foot_mat" rgba="0.18 0.18 0.20 1"/>
+  </asset>
+
+  <default>
+    <joint damping="0.08" armature="0.002"/>
+    <!--
+      Bit 1 collides with the ground; bit 2 enables self-collision between
+      non-adjacent robot bodies. MuJoCo's parent filter still allows the
+      intentional overlap at each articulated joint.
+    -->
+    <geom friction="1.1 0.02 0.002" condim="4" contype="2" conaffinity="3"
+          solref="0.008 1" solimp="0.95 0.99 0.002"/>
+    <default class="leg_joint">
+      <joint type="hinge" axis="0 1 0" limited="true"/>
+    </default>
+    <default class="servo">
+      <position kp="18" kv="1.4" ctrlrange="-2.6 2.6" forcerange="-2.2 2.2"/>
+    </default>
+  </default>
+
+  <worldbody>
+    <light pos="0 -1.5 2.5" dir="0 0.4 -1"/>
+    <geom name="ground" type="plane" size="3 3 0.1" material="floor"
+          contype="1" conaffinity="2"/>
+
+    <!--
+      The three root joints make this a planar robot.  It can translate in X/Z
+      and pitch about Y, but it cannot roll, yaw, or move sideways.
+    -->
+    <body name="torso" pos="0 0 0.348">
+      <joint name="root_x" type="slide" axis="1 0 0" damping="0.02"/>
+      <joint name="root_z" type="slide" axis="0 0 1" damping="0.02"/>
+      <joint name="root_pitch" type="hinge" axis="0 1 0" damping="0.03"/>
+
+      <!-- 6 x 4 studs, approximately 30 LEGO plates tall.  The lower edge stays fixed. -->
+      <geom name="torso_geom" type="box" pos="0 0 0.072" size="0.024 0.032 0.144"
+            mass="0.240" material="torso_mat"/>
+      <geom name="hip_block" type="box" pos="0 0 -0.076" size="0.032 0.052 0.012"
+            mass="0.080" material="joint_mat"/>
+
+      <body name="left_thigh" pos="0 0.038 -0.080">
+        <joint name="left_hip" class="leg_joint" range="-125 125"/>
+        <geom name="left_hip_hub" type="cylinder" axisangle="1 0 0 90" size="0.018 0.012"
+              mass="0.035" material="joint_mat"/>
+        <geom name="left_thigh_geom" type="capsule" fromto="0 0 -0.008 0 0 -0.112"
+              size="0.018" mass="0.060" material="left_mat"/>
+
+        <body name="left_shin" pos="0 0 -0.120">
+          <joint name="left_knee" class="leg_joint" range="-150 180"/>
+          <geom name="left_knee_hub" type="cylinder" axisangle="1 0 0 90" size="0.017 0.012"
+                mass="0.030" material="joint_mat"/>
+          <geom name="left_shin_geom" type="capsule" fromto="0 0 -0.008 0 0 -0.112"
+                size="0.016" mass="0.050" material="left_mat"/>
+
+          <body name="left_foot" pos="0 0 -0.120">
+            <geom name="left_foot_geom" type="box" pos="0 0 -0.014"
+                  size="0.120 0.032 0.014" mass="0.045" material="foot_mat"/>
+          </body>
+        </body>
+      </body>
+
+      <body name="right_thigh" pos="0 -0.038 -0.080">
+        <joint name="right_hip" class="leg_joint" range="-125 125"/>
+        <geom name="right_hip_hub" type="cylinder" axisangle="1 0 0 90" size="0.018 0.012"
+              mass="0.035" material="joint_mat"/>
+        <geom name="right_thigh_geom" type="capsule" fromto="0 0 -0.008 0 0 -0.112"
+              size="0.018" mass="0.060" material="right_mat"/>
+
+        <body name="right_shin" pos="0 0 -0.120">
+          <joint name="right_knee" class="leg_joint" range="-150 180"/>
+          <geom name="right_knee_hub" type="cylinder" axisangle="1 0 0 90" size="0.017 0.012"
+                mass="0.030" material="joint_mat"/>
+          <geom name="right_shin_geom" type="capsule" fromto="0 0 -0.008 0 0 -0.112"
+                size="0.016" mass="0.050" material="right_mat"/>
+
+          <body name="right_foot" pos="0 0 -0.120">
+            <geom name="right_foot_geom" type="box" pos="0 0 -0.014"
+                  size="0.120 0.032 0.014" mass="0.045" material="foot_mat"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="left_hip_servo" class="servo" joint="left_hip"/>
+    <position name="left_knee_servo" class="servo" joint="left_knee"
+              ctrlrange="-2.617993878 3.141592654"/>
+    <position name="right_hip_servo" class="servo" joint="right_hip"/>
+    <position name="right_knee_servo" class="servo" joint="right_knee"
+              ctrlrange="-2.617993878 3.141592654"/>
+  </actuator>
+
+  <sensor>
+    <jointpos name="left_hip_pos" joint="left_hip"/>
+    <jointpos name="left_knee_pos" joint="left_knee"/>
+    <jointpos name="right_hip_pos" joint="right_hip"/>
+    <jointpos name="right_knee_pos" joint="right_knee"/>
+    <jointvel name="left_hip_vel" joint="left_hip"/>
+    <jointvel name="left_knee_vel" joint="left_knee"/>
+    <jointvel name="right_hip_vel" joint="right_hip"/>
+    <jointvel name="right_knee_vel" joint="right_knee"/>
+    <framepos name="torso_position" objtype="body" objname="torso"/>
+    <framequat name="torso_orientation" objtype="body" objname="torso"/>
+  </sensor>
+
+  <keyframe>
+    <!-- qpos: root_x, root_z offset, root_pitch, L hip/knee, R hip/knee -->
+    <key name="stand" qpos="0 0 0 0 0 0 0" ctrl="0 0 0 0"/>
+    <!-- Flat face-down reset: torso and thighs horizontal, legs nearly straight. -->
+    <key name="prone" qpos="0 -0.318 1.5708 0 0.2618 0 0.2618"
+         ctrl="0 0.2618 0 0.2618"/>
+    <key name="supine" qpos="0 -0.218 -1.5708 1.2217 -1.8326 1.2217 -1.8326"
+         ctrl="1.22 -1.83 1.22 -1.83"/>
+  </keyframe>
+</mujoco>
