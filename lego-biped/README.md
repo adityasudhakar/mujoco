@@ -1,6 +1,8 @@
-# Planar LEGO biped
 
-https://github.com/user-attachments/assets/getup-prone-1-success.mp4
+
+https://github.com/user-attachments/assets/c0bcd396-c1e1-4645-8cbe-a26c64dc45d7
+
+# Planar LEGO biped
 
 <video src="assets/getup-prone-1-success.mp4" controls width="600"></video>
 
