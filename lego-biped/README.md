@@ -1,12 +1,9 @@
-
-
-https://github.com/user-attachments/assets/c0bcd396-c1e1-4645-8cbe-a26c64dc45d7
-
 # Planar LEGO biped
 
-<video src="assets/getup-prone-1-success.mp4" controls width="600"></video>
+<video src="assets/getup-policy-comparison.mp4" controls width="900"></video>
 
-*First successful get-up from prone position (October 12, 2026)*
+*Side-by-side: hand-tuned `getup_prone_1` and the RL-trained policy, both from
+the prone keyframe.*
 
 This is a deliberately small bridge between the rotary pendulum and a fully
 3-D walking robot.
