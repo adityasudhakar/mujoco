@@ -1,9 +1,9 @@
 # Planar LEGO biped
 
-<video src="assets/getup-policy-comparison.mp4" controls width="900"></video>
+Side-by-side: hand-tuned `getup_prone_1` and the RL-trained policy, both from
+the prone keyframe. [Play/download the MP4](assets/getup-policy-comparison.mp4).
 
-*Side-by-side: hand-tuned `getup_prone_1` and the RL-trained policy, both from
-the prone keyframe.*
+![Hand-tuned and RL-discovered prone get-up, side by side](assets/getup-policy-comparison.gif)
 
 This is a deliberately small bridge between the rotary pendulum and a fully
 3-D walking robot.
