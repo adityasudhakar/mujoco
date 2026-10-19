@@ -102,12 +102,77 @@ hold a full stand.  It scored 0/5 deterministic and 0/50 stochastic prone
 successes.  Checkpoints and evaluation logs are in
 `checkpoints/getup_300k_v2/`.
 
+## Separate standing-only sway experiment
+
+This experiment starts from the standing keyframe. It is useful only for
+studying balance corrections after standing; it is **not** the main task of
+getting up from prone without foot sway.
+
+Train the standing-only experiment:
+
+```bash
+/Users/adityasudhakar/toy-cleaner/.venv312/bin/python \
+  ./lego-biped/train_stand_sway.py --timesteps 300000 --n-envs 8
+```
+
+Watch the final trained policy (`P` pauses and `R` resets):
+
+```bash
+/Users/adityasudhakar/toy-cleaner/.venv312/bin/mjpython \
+  ./lego-biped/watch_stand_sway.py
+```
+
+## Main RL objective: prone to stand with minimal foot sway
+
+The task starts from the prone keyframe and aims to complete the full
+`getup_prone_1` routine, then hold a full stand for two seconds. The known
+successful script initializes the policy through behavior cloning; PPO then
+trains for its requested timestep budget. Planted-foot movement is penalized
+throughout the get-up and stand hold, with a stronger coefficient than in the
+first draft. Evaluation reports both full-stand success and mean planted-foot
+sway so a quick stand is not mistaken for a good result.
+
+The earlier reward's foot-sway coefficient was only `0.01`, too small to
+meaningfully compete with standing and height rewards. It is now `5.0`.
+
+Train a fresh run:
+
+```bash
+/Users/adityasudhakar/toy-cleaner/.venv312/bin/python \
+  lego-biped/train_keyframe_transition.py --timesteps 300000 --n-envs 8
+```
+
+Watch the final trained policy (`P` pauses and `R` resets):
+
+```bash
+/Users/adityasudhakar/toy-cleaner/.venv312/bin/mjpython \
+  lego-biped/watch_keyframe_transition.py
+```
+
+PPO runs for the full timestep budget unless interrupted. With 8 environments
+and 512 steps per environment per rollout, one PPO update is 4,096 aggregate
+transitions; 300,000 timesteps is about 74 updates. Evaluations run every
+10,000 timesteps. The final policy is saved at
+`lego-biped/checkpoints/prone_keyframe_transition/transition_ppo_final.zip`.
+The older `best/best_model.zip` predates the corrected training setup and
+should not be used for this task.
+
+Result (seed 42): the final trained policy completed the prone-to-stand task
+in 20/20 deterministic evaluation episodes. On the same 20 fixed-seed starts,
+the behavior-cloned scripted baseline averaged 0.109 m/s planted-foot sway;
+the final PPO policy averaged 0.058 m/s (about 47% lower). The learned policy
+uses a visibly different final standing posture than the scripted sequence.
+The script was a successful warm start; PPO then found its own lower-sway way
+to stand.
+
 ## Get-up status and next steps
 
-The initial manual motion-table attempts proved very difficult, and the PPO
-experiments above did not work.  Further manual iteration ultimately produced
-the successful `getup_prone_1` routine recorded above.  The saved PPO
-checkpoints remain experiment records, not working get-up policies.
+The initial manual motion-table attempts proved very difficult, and the first
+generic PPO get-up experiment did not work. Further manual iteration produced
+the successful `getup_prone_1` routine. The later prone-to-stand PPO experiment
+used that routine as a warm start and successfully reduced planted-foot sway.
+The next step is to test generalization from randomized, physically settled
+fallen poses rather than only the nominal prone keyframe.
 
 Next, adapt the approach in
 [UTRA RoboSoccer's Unified Humanoid Get-Up](https://github.com/utra-robosoccer/unified-humanoid-getup)

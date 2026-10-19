@@ -14,12 +14,18 @@ The original plan was to produce three repeatable scripted motions before RL:
 3. get up when lying face-up.
 
 Manual get-up tuning was initially very difficult, and the first 300,000-step
-PPO experiments failed to produce a stand.  Further manual iteration has now
-produced the first successful prone get-up.  The next learning attempt will
-adapt the settled-fall resets, symmetric actions, velocity-style control,
-observations, and staged reward used by UTRA RoboSoccer's Unified Humanoid
-Get-Up project.  The successful recording, failed-RL experiment record, and
-implementation checklist are in `lego-biped/README.md`.
+PPO experiments failed to produce a stand. Further manual iteration produced
+a successful hard-coded `getup_prone_1` routine. We then used that routine to
+warm-start PPO from the prone keyframe, with an explicit penalty for planted-
+foot sway. After training, the RL policy stood successfully in 20/20 fixed-seed
+tests and reduced mean planted-foot sway from 0.109 m/s for the scripted
+behavior-cloning baseline to 0.058 m/s. Its final joint targets produce a
+visibly different standing posture: the script supplied a successful starting
+behavior, while RL found its own lower-sway way to stand. This was PPO
+fine-tuning from a scripted demonstration, not learning from scratch.
+
+The experiment notes, evaluation details, and next steps are in
+`lego-biped/README.md`.
 
 ## Overview
 This repository contains the Julia code that runs on the Raspberry Pi-based Pupper robot, as well as the Julia code for simulating the same code in a MuJoCo environment on a desktop computer. 
