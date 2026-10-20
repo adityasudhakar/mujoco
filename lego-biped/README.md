@@ -2,11 +2,9 @@
 
 # An overnight RL experiment taught a simulated LEGO biped to stand
 
-## PR
+## Summary
 
 An overnight run of reinforcement learning found multiple ways for a simulated LEGO-style robot to get up from lying face-down and stand with both feet on the ground.
-
-## FAQ
 
 ### What is this?
 
