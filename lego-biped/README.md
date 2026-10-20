@@ -121,7 +121,7 @@ Watch the final trained policy (`P` pauses and `R` resets):
   ./lego-biped/watch_stand_sway.py
 ```
 
-## Main RL objective: prone to stand with minimal foot sway
+## Earlier PPO objective: prone to stand with minimal foot sway
 
 The task starts from the prone keyframe and aims to complete the full
 `getup_prone_1` routine, then hold a full stand for two seconds. The known
@@ -131,8 +131,8 @@ throughout the get-up and stand hold, with a stronger coefficient than in the
 first draft. Evaluation reports both full-stand success and mean planted-foot
 sway so a quick stand is not mistaken for a good result.
 
-The earlier reward's foot-sway coefficient was only `0.01`, too small to
-meaningfully compete with standing and height rewards. It is now `5.0`.
+In this earlier reward, the foot-sway coefficient was increased from `0.01`
+to `5.0` so it could meaningfully compete with standing and height rewards.
 
 Train a fresh run:
 
@@ -163,6 +163,88 @@ the final PPO policy averaged 0.058 m/s (about 47% lower). The learned policy
 uses a visibly different final standing posture than the scripted sequence.
 The script was a successful warm start; PPO then found its own lower-sway way
 to stand.
+
+## Overnight seed sweep: simpler height/sway reward (October 20, 2026)
+
+After experimenting with several reward terms and weights, we tried a simpler
+objective: raise the torso tip, keep planted feet still, and reward foot
+contact. The `height_sway` reward is exactly:
+
+```python
+reward = 10.0 * torso_top_z - 5.0 * foot_sway + 2.0 * planted_count
+```
+
+There is no uprightness term, pose-matching term, progress term, or success
+bonus in this reward. `torso_top_z` is the world-space height of the torso's
+top end in metres; `foot_sway` is the sum of the absolute horizontal X speeds
+of feet whose contact force exceeds 0.2; and `planted_count` is 0, 1, or 2.
+
+The separate pass/fail test requires both feet to be planted, the torso tip to
+reach at least 0.50 m, and each foot's horizontal X speed to be at most 0.02
+m/s, continuously for two seconds. Thus the reward provides dense signals for
+height, contact, and sway, while evaluation checks whether the complete target
+is held.
+
+Each policy started at the exact prone keyframe. The known
+`getup_prone_1` script supplied behavior-cloning demonstrations to warm-start
+PPO; the policy was then trained for 300,000 aggregate timesteps with 8
+parallel environments. We swept seeds 8 through 100 inclusive: **93
+independent runs, 27.9 million environment transitions in aggregate**, run
+three trainings at a time. The sweep took about 2 hours 34 minutes. This is a
+collection of independent 300k-step runs, not one continuous 27.9M-step
+training run.
+
+**11 of 93 seeds passed 20/20 deterministic evaluation episodes**; the other
+82 passed 0/20. The table lists the successful seeds, ordered by mean
+planted-foot sway over evaluation episodes:
+
+| Seed | Passed | Mean planted-foot sway |
+| ---: | ---: | ---: |
+| 59 | 20/20 | 0.02801 m/s |
+| 54 | 20/20 | 0.03236 m/s |
+| 93 | 20/20 | 0.03890 m/s |
+| 91 | 20/20 | 0.04044 m/s |
+| 17 | 20/20 | 0.04600 m/s |
+| 68 | 20/20 | 0.04700 m/s |
+| 46 | 20/20 | 0.04981 m/s |
+| 44 | 20/20 | 0.05245 m/s |
+| 21 | 20/20 | 0.05633 m/s |
+| 39 | 20/20 | 0.05765 m/s |
+| 64 | 20/20 | 0.06353 m/s |
+
+Seed 59 had the lowest measured sway among the successful policies. The 5×5
+video grid shows all 11 successful sweep policies, 13 representative failures
+(including high-return failures and low-sway failures), and seed 6's
+behavior-cloned script imitation before PPO fine-tuning. Every panel uses the
+same prone start and camera. The seed-6 imitation passed 10/10 before PPO, but
+its final PPO policy passed 0/20: fine-tuning can lose a working demonstrated
+behavior under this objective.
+
+The stricter acceptance test came after seed 1 appeared to pass the older
+torso-height/upright test while visibly standing on one leg. The later
+two-foot criterion distinguishes that pose from the intended result.
+
+<video src="assets/seed-sweep-5x5.mp4" poster="assets/seed-sweep-5x5-poster.jpg" controls width="960"></video>
+
+[Play or download the 5×5 MP4](assets/seed-sweep-5x5.mp4) · [View the static poster](assets/seed-sweep-5x5-poster.jpg)
+
+The full sanitized per-seed evaluation table is in
+[`experiments/seed-sweep-8-100-results.csv`](experiments/seed-sweep-8-100-results.csv).
+Raw logs and all 93 model folders remain local under
+`lego-biped/checkpoints/seed_sweep_8_100/` and
+`lego-biped/checkpoints/prone_height_sway_balanced_10_seed<N>_sweep/`; the
+large checkpoint collection is not committed. The sweep is reproducible with
+`lego-biped/run_seed_sweep.py`; it writes a separate folder per seed and
+refuses to overwrite existing runs. The video can be regenerated with
+`lego-biped/render_seed_sweep_grid.py` while those local checkpoints are
+available.
+
+One 600,000-step seed-1 run was also tried **from scratch**, not resumed from
+the 300,000-step policy. It still passed 0/20; its torso tip reached 0.435 m.
+This was not a controlled timestep comparison: the 300k run still included a
+75-point success bonus, which was removed before the 600k run. The result shows
+that a 600k run with the later reward still failed, not that extra timesteps
+alone caused the lower torso height.
 
 ## Get-up status and next steps
 

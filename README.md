@@ -24,6 +24,14 @@ visibly different standing posture: the script supplied a successful starting
 behavior, while RL found its own lower-sway way to stand. This was PPO
 fine-tuning from a scripted demonstration, not learning from scratch.
 
+A later, separate experiment simplified the objective to torso-tip height,
+planted-foot contact, and low foot sway, then swept 93 independent seeds
+(8–100) for 300,000 timesteps each overnight. Eleven final policies passed
+20/20 tests requiring both feet planted, a torso-tip height of at least 0.50 m,
+and near-zero horizontal foot speed held for two seconds. The experiment,
+results, and 5×5 comparison video are documented in
+[`lego-biped/README.md`](lego-biped/README.md).
+
 The experiment notes, evaluation details, and next steps are in
 `lego-biped/README.md`.
 
