@@ -1,4 +1,4 @@
-<video src="assets/seed-sweep-5x5.mp4" poster="assets/seed-sweep-5x5-poster.jpg" controls width="960"></video>
+![Animated 5×5 grid of overnight MuJoCo reinforcement-learning results](assets/seed-sweep-5x5.gif)
 
 # An overnight RL experiment taught a simulated LEGO biped to stand
 
