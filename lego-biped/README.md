@@ -28,6 +28,8 @@ reward = 10.0 * torso_top_z - 5.0 * foot_sway + 2.0 * planted_count
 
 Eleven of the 93 trained policies passed the final test in all 20 tries: both feet on the ground, torso tip at least 0.50 m high, and feet nearly still while holding the stand for two seconds. The best passing policy had average planted-foot sway of 0.028 m/s.
 
+This was my “Olympics running robot” moment: RL found a novel way to stand up that I hadn’t thought of.
+
 The 5×5 video above shows 25 examples: all 11 passing policies, selected failures, and the scripted demonstration before training. Each clip starts from the same face-down pose.
 
 ### What’s next?
