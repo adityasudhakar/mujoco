@@ -2,38 +2,12 @@
 
 ## Current learning project
 
-We are building a small planar LEGO/Technic biped as the next MuJoCo + RL
-exercise.  The first version has four powered joints (left/right hip and knee),
-fixed broad feet, and is constrained to forward/backward motion so that we can
-learn one difficulty at a time.
-
-The original plan was to produce three repeatable scripted motions before RL:
-
-1. walk forward;
-2. get up when lying face-down;
-3. get up when lying face-up.
-
-Manual get-up tuning was initially very difficult, and the first 300,000-step
-PPO experiments failed to produce a stand. Further manual iteration produced
-a successful hard-coded `getup_prone_1` routine. We then used that routine to
-warm-start PPO from the prone keyframe, with an explicit penalty for planted-
-foot sway. After training, the RL policy stood successfully in 20/20 fixed-seed
-tests and reduced mean planted-foot sway from 0.109 m/s for the scripted
-behavior-cloning baseline to 0.058 m/s. Its final joint targets produce a
-visibly different standing posture: the script supplied a successful starting
-behavior, while RL found its own lower-sway way to stand. This was PPO
-fine-tuning from a scripted demonstration, not learning from scratch.
-
-A later, separate experiment simplified the objective to torso-tip height,
-planted-foot contact, and low foot sway, then swept 93 independent seeds
-(8–100) for 300,000 timesteps each overnight. Eleven final policies passed
-20/20 tests requiring both feet planted, a torso-tip height of at least 0.50 m,
-and near-zero horizontal foot speed held for two seconds. The experiment,
-results, and 5×5 comparison video are documented in
-[`lego-biped/README.md`](lego-biped/README.md).
-
-The experiment notes, evaluation details, and next steps are in
-`lego-biped/README.md`.
+We use MuJoCo, a physics simulator, to train a LEGO-inspired biped to stand up
+from lying face-down. The simplified robot has two hip motors and two knee
+motors, and moves forward and backward without falling sideways. An overnight
+reinforcement-learning experiment tested 93 training runs; 11 learned policies
+passed the two-foot standing test. The short PRFAQ and 5×5 video are in the
+[`LEGO biped project notes`](lego-biped/README.md).
 
 ## Overview
 This repository contains the Julia code that runs on the Raspberry Pi-based Pupper robot, as well as the Julia code for simulating the same code in a MuJoCo environment on a desktop computer. 
